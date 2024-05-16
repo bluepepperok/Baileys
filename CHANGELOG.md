@@ -1,3 +1,7 @@
+## [6.7.2-bp-2](https://github.com/WhiskeySockets/Baileys/compare/v6.7.2-bp-1-dev.0...v6.7.2-bp-2) (2024-05-16)
+
+
+
 ## [6.7.2-bp-1-dev.0](https://github.com/WhiskeySockets/Baileys/compare/v6.7.2...v6.7.2-bp-1-dev.0) (2024-05-16)
 
 
