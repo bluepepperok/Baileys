@@ -10,7 +10,7 @@ import fs from 'fs'
 import P from 'pino'
 
 const logger = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` }, P.destination('./wa-logs.txt'))
-logger.level = 'trace'
+logger.level = 'warn'
 
 const useStore = !process.argv.includes('--no-store')
 const doReplies = process.argv.includes('--do-reply')
