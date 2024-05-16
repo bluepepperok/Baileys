@@ -2,6 +2,8 @@ import { Boom } from '@hapi/boom'
 import NodeCache from 'node-cache'
 import readline from 'readline'
 import makeWASocket, { AnyMessageContent, BinaryInfo, delay, DisconnectReason, downloadAndProcessHistorySyncNotification, encodeWAM, fetchLatestBaileysVersion, getAggregateVotesInPollMessage, getHistoryMsg, isJidNewsletter, makeCacheableSignalKeyStore, makeInMemoryStore, proto, useMultiFileAuthState, WAMessageContent, WAMessageKey } from '../src'
+import { downloadMediaMessage } from '../src'
+import { writeFile } from 'fs/promises'
 //import MAIN_LOGGER from '../src/Utils/logger'
 import open from 'open'
 import fs from 'fs'
@@ -223,6 +225,30 @@ const startSock = async() => {
 						}
 
 						if(!msg.key.fromMe && doReplies && !isJidNewsletter(msg.key?.remoteJid!)) {
+
+
+							if (msg.message) {
+								// if there is a text or media message
+								const messageType = Object.keys (msg.message)[0]// get what type of message it is -- text, image, video
+								// if the message is an audio
+								if (messageType === 'audioMessage') {
+									// download the message
+									const buffer = await downloadMediaMessage(
+										msg,
+										'buffer',
+										{ },
+										{
+											logger,
+											// pass this so that baileys can request a reupload of media
+											// that has been deleted
+											reuploadRequest: sock.updateMediaMessage
+										}
+									)
+									console.log('buffer', buffer)
+									// save to file
+									await writeFile('./my-download.ogg', buffer)
+								}	
+							}						
 
 							console.log('replying to', msg.key.remoteJid)
 							await sock!.readMessages([msg.key])
