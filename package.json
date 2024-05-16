@@ -1,5 +1,5 @@
 {
-  "name": "baileys",
+  "name": "@bluepepperok/baileys",
   "version": "6.7.2-bp-2",
   "description": "WhatsApp API",
   "keywords": [
@@ -12,12 +12,12 @@
     "automation",
     "multi-device"
   ],
-  "homepage": "https://github.com/WhiskeySockets/Baileys",
+  "homepage": "https://github.com/bluepepperok/Baileys",
   "repository": {
-    "url": "git@github.com:WhiskeySockets/Baileys.git"
+    "url": "git@github.com:bluepepperok/Baileys.git"
   },
   "license": "MIT",
-  "author": "Adhiraj Singh",
+  "author": "Adhiraj Singh & BluePepper",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
