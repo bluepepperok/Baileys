@@ -1,3 +1,7 @@
+## [6.7.2-bp-4](https://github.com/bluepepperok/Baileys/compare/v6.7.2-bp-3...v6.7.2-bp-4) (2024-05-17)
+
+
+
 ## [6.7.2-bp-3](https://github.com/bluepepperok/Baileys/compare/v6.7.2-bp-2...v6.7.2-bp-3) (2024-05-16)
 
 

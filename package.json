@@ -1,6 +1,6 @@
 {
   "name": "@bluepepperok/baileys",
-  "version": "6.7.2-bp-3",
+  "version": "6.7.2-bp-4",
   "description": "WhatsApp API",
   "keywords": [
     "whatsapp",
@@ -103,5 +103,5 @@
   "packageManager": "yarn@1.22.19",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
-  }  
+  }
 }
