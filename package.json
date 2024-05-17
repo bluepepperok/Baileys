@@ -1,6 +1,6 @@
 {
   "name": "@bluepepperok/baileys",
-  "version": "6.7.2-bp-4",
+  "version": "6.7.2-bp-5",
   "description": "WhatsApp API",
   "keywords": [
     "whatsapp",
@@ -70,6 +70,7 @@
     "eslint": "^8.0.0",
     "jest": "^27.0.6",
     "jimp": "^0.16.1",
+    "json": "^11.0.0",
     "link-preview-js": "^3.0.0",
     "open": "^8.4.2",
     "qrcode-terminal": "^0.12.0",
@@ -78,8 +79,7 @@
     "ts-jest": "^27.0.3",
     "ts-node": "^10.8.1",
     "typedoc": "^0.24.7",
-    "typescript": "^4.6.4",
-    "json": "^11.0.0"
+    "typescript": "^4.6.4"
   },
   "peerDependencies": {
     "jimp": "^0.16.1",
