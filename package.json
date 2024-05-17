@@ -101,8 +101,5 @@
       "optional": true
     }
   },
-  "packageManager": "yarn@1.22.19",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  }
+  "packageManager": "yarn@1.22.19"
 }
