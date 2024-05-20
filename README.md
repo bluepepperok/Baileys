@@ -11,7 +11,6 @@ The module is available on github packages.
 
 ## New versions
 - If you want to start off a different branch of the original repo, create a new branch with the content of that branch.
-- Before making any changes, update the `version` field on [package.json](package.json) to `originalVersion-bp-N-dev` and commit the file to git. N starts with 1 and should be increased for every custom version based off the same original version.  
 - See the changes already done by BluePepper on other branches of this project and check whether you need to cherry pick some commits.
 - Make the changes you want.
 - Use [Example/example.ts](Example/example.ts) to test your changes.
