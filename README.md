@@ -22,9 +22,8 @@ The module is available on github packages.
     - Baileys dependencies were downloaded into `whatsapp-productivity/node_modules` during `npm install`. TODO: if baileys local version changed its dependencies, find a way to test the updated dependencies.
   - Run "Whatsapp productivity" and make sure everything works fine.
   - Run `npm install` to revert `npx link pathToBaseDirWhereYouCloneGithubRepos/baileys`.
-- Update the `version` field on [package.json](package.json) to `originalVersion-bp-N` and commit the file to git.
 - To publish a package version you need your own `.npmrc` (See `.npmrc.example`)
-- `yarn publish`
+- `yarn publish` and select a version name `originalVersion-bp-N` where N is previous version + 1.
 - `git push`
 - `git push --tags`
 - Make sure the package was published on the packages section of this repo.
