@@ -16,16 +16,17 @@ The module is available on github packages.
 - Make the changes you want.
 - Use [Example/example.ts](Example/example.ts) to test your changes.
 - Make "Whatsapp productivity" use your local version of this library and test the changes.
-  - Get "Whatsapp productivity" use your local version of this library  
-    - Update "Whatsapp productivity"'s `package.json` to use `"@bluepepperok/baileys": "file:/pathToBaseDirWhereYouCloneGithubRepos/baileys"` and run `npm install`.
-     - Alternatively you could use `npm link` on baileys dir and then `npm link @bluepepperok/baileys` on "Whatsapp productivity" dir
-  - If baileys changed its dependencies, make sure you are testing "Whatsapp productivity" with the updated dependencies.
-  - Test the changes
+  - On "Whatsapp productivity" dir run `npx link pathToBaseDirWhereYouCloneGithubRepos/baileys`. 
+    - This won't cange its `package.json`
+    - It will replace the downloaded release version in `whatsapp-productivity/node_modules/@bluepepperok/baileys/` for a symlink to `pathToBaseDirWhereYouCloneGithubRepos/baileys`.
+    - Baileys dependencies were downloaded into `whatsapp-productivity/node_modules` during `npm install`. TODO: if baileys local version changed its dependencies, find a way to test the updated dependencies.
+  - Run "Whatsapp productivity" and make sure everything works fine.
+  - Run `npm install` to revert `npx link pathToBaseDirWhereYouCloneGithubRepos/baileys`.
 - Update the `version` field on [package.json](package.json) to `originalVersion-bp-N` and commit the file to git.
 - To publish a package version you need your own `.npmrc` (See `.npmrc.example`)
 - `yarn publish`
 - Make sure the package was published on the packages section of this repo.
-- Update "Whatsapp productivity"'s `package.json` to use the new version of this library and test the changes.
+- Update "Whatsapp productivity"'s `package.json` to use the new version of this library, run `npm install` and test the changes.
 
 
 ## How to get the .npmrc authToken / YOUR_PERSONAL_ACCESS_TOKEN
