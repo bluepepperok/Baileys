@@ -25,6 +25,8 @@ The module is available on github packages.
 - Update the `version` field on [package.json](package.json) to `originalVersion-bp-N` and commit the file to git.
 - To publish a package version you need your own `.npmrc` (See `.npmrc.example`)
 - `yarn publish`
+- `git push`
+- `git push --tags`
 - Make sure the package was published on the packages section of this repo.
 - Update "Whatsapp productivity"'s `package.json` to use the new version of this library, run `npm install` and test the changes.
 
