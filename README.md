@@ -16,7 +16,7 @@ The module is available on github packages.
 - Use [Example/example.ts](Example/example.ts) to test your changes.
 - Make Ozer use your local version of this library and test the changes.
   - On Ozer dir run `npx link pathToBaseDirWhereYouCloneGithubRepos/baileys`. 
-    - This won't cange its `package.json`
+    - This won't change its `package.json`
     - It will replace the downloaded release version in `ozer/node_modules/@bluepepperok/baileys/` for a symlink to `pathToBaseDirWhereYouCloneGithubRepos/baileys`.
     - Baileys dependencies were downloaded into `ozer/node_modules` during `npm install`. TODO: if baileys local version changed its dependencies, find a way to test the updated dependencies.
   - Run Ozer and make sure everything works fine.
