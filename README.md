@@ -10,7 +10,7 @@ The module is available on github packages.
 [Ozer](https://github.com/bluepepperok/ozer) has a dependency on this library. It's `package.json` includes: `"@bluepepperok/baileys": "^specificVersionToUse"`.
 
 ## New versions
-- If you want to start off a different branch of the original repo, create a new branch with the content of that branch.
+- If you want to start off a different branch of the original repo, create a new branch with the content of that branch, and make the new branch the default branch on github.
 - See the changes already done by BluePepper on other branches of this project and check whether you need to cherry pick some commits.
 - Make the changes you want.
 - Use [Example/example.ts](Example/example.ts) to test your changes.
