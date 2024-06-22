@@ -436,10 +436,11 @@ const processMessage = async(
 				)
 			}
 		} else {
-			logger?.warn(
-				{ creationMsgKey },
-				'poll creation message not found, cannot decrypt update'
-			)
+			// Comment out poll warning since we don't care about polls
+			// logger?.warn(
+			// 	{ creationMsgKey },
+			// 	'poll creation message not found, cannot decrypt update'
+			// )
 		}
 	}
 
