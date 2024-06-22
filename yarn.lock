@@ -4947,9 +4947,9 @@ libphonenumber-js@^1.10.20:
   resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.11.11.tgz#f4d521d7e2d1958916820e3725e609a2ea7575a8"
   integrity sha512-mF3KaORjJQR6JBNcOkluDcJKhtoQT4VTLRMrX1v/wlBayL4M8ybwEDeryyPcrSEJmD0rVwHUbBarpZwN5NfPFQ==
 
-"libsignal@github:WhiskeySockets/libsignal-node":
+"libsignal@github:bluepepperok/libsignal-node":
   version "2.0.1"
-  resolved "https://codeload.github.com/WhiskeySockets/libsignal-node/tar.gz/83a3e3a3864511cb74df1b796373f0d49d071134"
+  resolved "https://codeload.github.com/bluepepperok/libsignal-node/tar.gz/bbc4830f6a2e71faa1d5bc7c0361e39cad04a1ba"
   dependencies:
     curve25519-js "^0.0.4"
     protobufjs "6.8.8"
