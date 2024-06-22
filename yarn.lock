@@ -4949,7 +4949,7 @@ libphonenumber-js@^1.10.20:
 
 "libsignal@github:bluepepperok/libsignal-node":
   version "2.0.1"
-  resolved "https://codeload.github.com/bluepepperok/libsignal-node/tar.gz/bbc4830f6a2e71faa1d5bc7c0361e39cad04a1ba"
+  resolved "https://codeload.github.com/bluepepperok/libsignal-node/tar.gz/601c0df92028f3e17ddf612c8b6147d98f99379e"
   dependencies:
     curve25519-js "^0.0.4"
     protobufjs "6.8.8"
