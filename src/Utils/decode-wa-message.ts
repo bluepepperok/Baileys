@@ -205,11 +205,20 @@ export const decryptMessageNode = (
 						} else {
 							fullMessage.message = msg
 						}
-					} catch(err) {
-						logger.error(
-							{ key: fullMessage.key, err },
-							'failed to decrypt message'
-						)
+					} catch(err) {						
+						if (err.message === 'No SenderKeyRecord found for decryption' || 
+						    err.message === 'No session found to decrypt message') {
+							// A group message could not be decrypted, so it is lost.
+							// These errors of group message decryption failure occur often.
+							// Trade-off between logging to not miss important bugs and 
+							// not logging to avoid flooding the log with known issues.
+							// For the moment, we skip logging until a bufix is implemented.
+						} else {
+							logger.error(
+								{ key: fullMessage.key, err },
+								'failed to decrypt message'
+							)	
+						}
 						fullMessage.messageStubType = proto.WebMessageInfo.StubType.CIPHERTEXT
 						fullMessage.messageStubParameters = [err.message]
 					}
