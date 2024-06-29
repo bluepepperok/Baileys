@@ -62,6 +62,9 @@ export default (config: BaileysInMemoryStoreConfig) => {
 	const contactsUpsert = (newContacts: Contact[]) => {
 		const oldContacts = new Set(Object.keys(contacts))
 		for(const contact of newContacts) {
+			if (contact['name'] === undefined) {
+				delete contact['name'];
+			}
 			oldContacts.delete(contact.id)
 			contacts[contact.id] = Object.assign(
 				contacts[contact.id] || {},
@@ -107,11 +110,11 @@ export default (config: BaileysInMemoryStoreConfig) => {
 			logger.debug({ chatsAdded }, 'synced chats')
 
 			const oldContacts = contactsUpsert(newContacts)
-			if(isLatest) {
-				for(const jid of oldContacts) {
-					delete contacts[jid]
-				}
-			}
+			// if(isLatest) {
+			// 	for(const jid of oldContacts) {
+			// 		delete contacts[jid]
+			// 	}
+			// }
 
 			logger.debug({ deletedContacts: isLatest ? oldContacts.size : 0, newContacts }, 'synced contacts')
 
