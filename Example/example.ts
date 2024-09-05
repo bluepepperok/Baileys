@@ -59,7 +59,6 @@ const startSock = async() => {
 		// comment the line below out
 		// shouldIgnoreJid: jid => isJidBroadcast(jid),
 		// implement to handle retries & poll updates
-		getMessage,
 	})
 
 	store?.bind(sock.ev)

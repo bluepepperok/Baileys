@@ -33,7 +33,6 @@ export type BaileysInMemoryStoreConfig = {
 	socket?: WASocket
 }
 
-const makeMessagesDictionary = () => makeOrderedDictionary(waMessageID)
 
 export default (config: BaileysInMemoryStoreConfig) => {
 	const socket = config.socket
@@ -43,7 +42,6 @@ export default (config: BaileysInMemoryStoreConfig) => {
 	const KeyedDB = require('@adiwajshing/keyed-db').default
 
 	const chats = new KeyedDB(chatKey, c => c.id) as KeyedDB<Chat, string>
-	const messages: { [_: string]: ReturnType<typeof makeMessagesDictionary> } = {}
 	const contacts: { [_: string]: Contact } = {}
 	const groupMetadata: { [_: string]: GroupMetadata } = {}
 	const presences: { [id: string]: { [participant: string]: PresenceData } } = {}
@@ -51,13 +49,6 @@ export default (config: BaileysInMemoryStoreConfig) => {
 	const labels = new ObjectRepository<Label>()
 	const labelAssociations = new KeyedDB(labelAssociationKey, labelAssociationKey.key) as KeyedDB<LabelAssociation, string>
 
-	const assertMessageList = (jid: string) => {
-		if(!messages[jid]) {
-			messages[jid] = makeMessagesDictionary()
-		}
-
-		return messages[jid]
-	}
 
 	const contactsUpsert = (newContacts: Contact[]) => {
 		const oldContacts = new Set(Object.keys(contacts))
@@ -84,7 +75,7 @@ export default (config: BaileysInMemoryStoreConfig) => {
 	/**
 	 * binds to a BaileysEventEmitter.
 	 * It listens to all events and constructs a state that you can query accurate data from.
-	 * Eg. can use the store to fetch chats, contacts, messages etc.
+	 * Eg. can use the store to fetch chats, contacts, etc.
 	 * @param ev typically the event emitter from the socket connection
 	 */
 	const bind = (ev: BaileysEventEmitter) => {
@@ -107,9 +98,6 @@ export default (config: BaileysInMemoryStoreConfig) => {
 			if(isLatest) {
 				chats.clear()
 
-				for(const id in messages) {
-					delete messages[id]
-				}
 			}
 
 			const chatsAdded = chats.insertIfAbsent(...newChats).length
@@ -124,11 +112,6 @@ export default (config: BaileysInMemoryStoreConfig) => {
 
 			logger.debug({ deletedContacts: isLatest ? oldContacts.size : 0, newContacts }, 'synced contacts')
 
-			for(const msg of newMessages) {
-				const jid = msg.key.remoteJid!
-				const list = assertMessageList(jid)
-				list.upsert(msg, 'prepend')
-			}
 
 			logger.debug({ messages: newMessages.length }, 'synced messages')
 		})
@@ -225,8 +208,6 @@ export default (config: BaileysInMemoryStoreConfig) => {
 			case 'notify':
 				for(const msg of newMessages) {
 					const jid = jidNormalizedUser(msg.key.remoteJid!)
-					const list = assertMessageList(jid)
-					list.upsert(msg, 'append')
 
 					if(type === 'notify') {
 						if(!chats.get(jid)) {
@@ -244,37 +225,7 @@ export default (config: BaileysInMemoryStoreConfig) => {
 				break
 			}
 		})
-		ev.on('messages.update', updates => {
-			for(const { update, key } of updates) {
-				const list = assertMessageList(jidNormalizedUser(key.remoteJid!))
-				if(update?.status) {
-					const listStatus = list.get(key.id!)?.status
-					if(listStatus && update?.status <= listStatus) {
-						logger.debug({ update, storedStatus: listStatus }, 'status stored newer then update')
-						delete update.status
-						logger.debug({ update }, 'new update object')
-					}
-				}
 
-				const result = list.updateAssign(key.id!, update)
-				if(!result) {
-					logger.debug({ update }, 'got update for non-existent message')
-				}
-			}
-		})
-		ev.on('messages.delete', item => {
-			if('all' in item) {
-				const list = messages[item.jid]
-				list?.clear()
-			} else {
-				const jid = item.keys[0].remoteJid!
-				const list = messages[jid]
-				if(list) {
-					const idSet = new Set(item.keys.map(k => k.id))
-					list.filter(m => !idSet.has(m.key.id))
-				}
-			}
-		})
 
 		ev.on('groups.update', updates => {
 			for(const update of updates) {
@@ -310,31 +261,12 @@ export default (config: BaileysInMemoryStoreConfig) => {
 			}
 		})
 
-		ev.on('message-receipt.update', updates => {
-			for(const { key, receipt } of updates) {
-				const obj = messages[key.remoteJid!]
-				const msg = obj?.get(key.id!)
-				if(msg) {
-					updateMessageWithReceipt(msg, receipt)
-				}
-			}
-		})
 
-		ev.on('messages.reaction', (reactions) => {
-			for(const { key, reaction } of reactions) {
-				const obj = messages[key.remoteJid!]
-				const msg = obj?.get(key.id!)
-				if(msg) {
-					updateMessageWithReaction(msg, reaction)
-				}
-			}
-		})
 	}
 
 	const toJSON = () => ({
 		chats,
 		contacts,
-		messages,
 		labels,
 		labelAssociations
 	})
@@ -344,51 +276,20 @@ export default (config: BaileysInMemoryStoreConfig) => {
 		labelAssociations.upsert(...json.labelAssociations || [])
 		contactsUpsert(Object.values(json.contacts))
 		labelsUpsert(Object.values(json.labels || {}))
-		for(const jid in json.messages) {
-			const list = assertMessageList(jid)
-			for(const msg of json.messages[jid]) {
-				list.upsert(proto.WebMessageInfo.fromObject(msg), 'append')
-			}
-		}
+
 	}
 
 
 	return {
 		chats,
 		contacts,
-		messages,
 		groupMetadata,
 		state,
 		presences,
 		labels,
 		labelAssociations,
 		bind,
-		/** loads messages from the store, if not found -- uses the legacy connection */
-		loadMessages: async(jid: string, count: number, cursor: WAMessageCursor) => {
-			const list = assertMessageList(jid)
-			const mode = !cursor || 'before' in cursor ? 'before' : 'after'
-			const cursorKey = !!cursor ? ('before' in cursor ? cursor.before : cursor.after) : undefined
-			const cursorValue = cursorKey ? list.get(cursorKey.id!) : undefined
 
-			let messages: WAMessage[]
-			if(list && mode === 'before' && (!cursorKey || cursorValue)) {
-				if(cursorValue) {
-					const msgIdx = list.array.findIndex(m => m.key.id === cursorKey?.id)
-					messages = list.array.slice(0, msgIdx)
-				} else {
-					messages = list.array
-				}
-
-				const diff = count - messages.length
-				if(diff < 0) {
-					messages = messages.slice(-count) // get the last X messages
-				}
-			} else {
-				messages = []
-			}
-
-			return messages
-		},
 		/**
 		 * Get all available labels for profile
 		 *
@@ -420,11 +321,6 @@ export default (config: BaileysInMemoryStoreConfig) => {
 
 			return associations.map(({ labelId }) => labelId)
 
-		},
-		loadMessage: async(jid: string, id: string) => messages[jid]?.get(id),
-		mostRecentMessage: async(jid: string) => {
-			const message: WAMessage | undefined = messages[jid]?.array.slice(-1)[0]
-			return message
 		},
 		fetchImageUrl: async(jid: string, sock: WASocket | undefined) => {
 			const contact = contacts[jid]
@@ -458,11 +354,6 @@ export default (config: BaileysInMemoryStoreConfig) => {
 
 		// 	return groupMetadata[jid]
 		// },
-		fetchMessageReceipts: async({ remoteJid, id }: WAMessageKey) => {
-			const list = messages[remoteJid!]
-			const msg = list?.get(id!)
-			return msg?.userReceipt
-		},
 		toJSON,
 		fromJSON,
 		writeToFile: (path: string) => {
