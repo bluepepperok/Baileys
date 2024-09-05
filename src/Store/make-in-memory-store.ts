@@ -31,12 +31,15 @@ export type BaileysInMemoryStoreConfig = {
 	labelAssociationKey?: Comparable<LabelAssociation, string>
 	logger?: Logger
 	socket?: WASocket
+	// Number of days to keep messages. If not set, messages will be kept indefinitely.
+	messageRetentionPeriod?: number
 }
 
 const makeMessagesDictionary = () => makeOrderedDictionary(waMessageID)
 
 export default (config: BaileysInMemoryStoreConfig) => {
 	const socket = config.socket
+	const messageRetentionPeriod = config.messageRetentionPeriod
 	const chatKey = config.chatKey || waChatKey(true)
 	const labelAssociationKey = config.labelAssociationKey || waLabelAssociationKey
 	const logger: Logger = config.logger || DEFAULT_CONNECTION_CONFIG.logger.child({ stream: 'in-mem-store' })
@@ -127,7 +130,10 @@ export default (config: BaileysInMemoryStoreConfig) => {
 			for(const msg of newMessages) {
 				const jid = msg.key.remoteJid!
 				const list = assertMessageList(jid)
-				list.upsert(msg, 'prepend')
+				// if msg is old, don't add it
+				if(shouldKeepMessage(msg)) {
+					list.upsert(msg, 'prepend')
+				}
 			}
 
 			logger.debug({ messages: newMessages.length }, 'synced messages')
@@ -226,7 +232,10 @@ export default (config: BaileysInMemoryStoreConfig) => {
 				for(const msg of newMessages) {
 					const jid = jidNormalizedUser(msg.key.remoteJid!)
 					const list = assertMessageList(jid)
-					list.upsert(msg, 'append')
+					// if msg is old, don't add it
+					if(shouldKeepMessage(msg)) {
+						list.upsert(msg, 'append')	
+					}
 
 					if(type === 'notify' && !chats.get(jid)) {
 						ev.emit('chats.upsert', [
@@ -350,6 +359,14 @@ export default (config: BaileysInMemoryStoreConfig) => {
 		}
 	}
 
+	// Return true if the message is younger than messageRetentionPeriod
+	const shouldKeepMessage = (msg: proto.IWebMessageInfo): boolean => {
+		const now = Date.now()
+		// if messageRetentionPeriod is not set, keep the message
+		if (!messageRetentionPeriod) return true
+		return now - (Number(msg.messageTimestamp ?? now/1000) * 1000) <= (messageRetentionPeriod * 24 * 60 * 60 * 1000)
+	}
+
 
 	return {
 		chats,
@@ -423,6 +440,17 @@ export default (config: BaileysInMemoryStoreConfig) => {
 		mostRecentMessage: async(jid: string) => {
 			const message: WAMessage | undefined = messages[jid]?.array.slice(-1)[0]
 			return message
+		},
+		// Removes messages older than `messageRetentionPeriod` days
+		removeOldMessages: () => {
+			for(const jid in messages) {
+				const list = messages[jid]
+				const oldMessages = list.array.filter(msg => !shouldKeepMessage(msg))
+				for(const msg of oldMessages) {
+					list.remove(msg)
+				}
+			}
+
 		},
 		fetchImageUrl: async(jid: string, sock: WASocket | undefined) => {
 			const contact = contacts[jid]
